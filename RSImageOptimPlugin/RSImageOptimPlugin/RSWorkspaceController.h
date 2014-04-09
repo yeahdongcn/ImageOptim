@@ -8,6 +8,12 @@
 
 #import <Foundation/Foundation.h>
 
+@class IDEWorkspaceWindowController;
+
 @interface RSWorkspaceController : NSObject
+
++ (NSString *)pathForFileNameInCurrentWorkspace:(NSString *)fileName;
+
++ (NSString *)currentWorkspaceDirectoryPath;
 
 @end
