@@ -37,16 +37,16 @@ static NSString *const kRSImageOptimPluginAutoKey = @"com.pdq.rsimageoptimplugin
     }
 }
 
-- (void)imageOptimWithPath:(NSString *)path
+- (void)doImageOptimWithPath:(NSString *)path
 {
     NSURL *fileURL = [NSURL fileURLWithPath:path];
     NSWorkspace * ws = [NSWorkspace sharedWorkspace];
     [ws openFile:[fileURL path] withApplication:@"ImageOptim"];
 }
 
-- (void)doImageOptimInWorkspace
+- (void)imageOptimInWorkspace
 {
-    [self imageOptimWithPath:[RSWorkspaceController currentWorkspaceDirectoryPath]];
+    [self doImageOptimWithPath:[RSWorkspaceController currentWorkspaceDirectoryPath]];
 }
 
 - (void)notificationListener:(NSNotification *)notification
@@ -62,7 +62,7 @@ static NSString *const kRSImageOptimPluginAutoKey = @"com.pdq.rsimageoptimplugin
             dispatch_async(dispatch_get_main_queue(), ^{
                 NSString *filePath = [RSWorkspaceController pathForFileNameInCurrentWorkspace:fileName];
                 if (filePath) {
-                    [self imageOptimWithPath:filePath];
+                    [self doImageOptimWithPath:filePath];
                 }
             });
         });
@@ -94,7 +94,7 @@ static NSString *const kRSImageOptimPluginAutoKey = @"com.pdq.rsimageoptimplugin
             }
         }
         if (filePath) {
-            [self imageOptimWithPath:filePath];
+            [self doImageOptimWithPath:filePath];
         }
     }
 }
@@ -116,7 +116,10 @@ static NSString *const kRSImageOptimPluginAutoKey = @"com.pdq.rsimageoptimplugin
 
 - (void)stopListen
 {
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"PBXBuildFileWasAddedToBuildPhaseNotification" object:nil];
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"DVTModelObjectGraphObjectsDidChangeNotificationName" object:nil];
+    
     NSLog(@"%@ %@", kRSImageOptimPlugin, @" stop");
 }
 
@@ -147,7 +150,7 @@ static NSString *const kRSImageOptimPluginAutoKey = @"com.pdq.rsimageoptimplugin
         NSMenuItem *menuItem = [[NSApp mainMenu] itemWithTitle:@"File"];
         if (menuItem) {
             [[menuItem submenu] addItem:[NSMenuItem separatorItem]];
-            NSMenuItem *actionMenuItem = [[NSMenuItem alloc] initWithTitle:@"ImageOptim" action:@selector(doImageOptimInWorkspace) keyEquivalent:@""];
+            NSMenuItem *actionMenuItem = [[NSMenuItem alloc] initWithTitle:@"ImageOptim" action:@selector(imageOptimInWorkspace) keyEquivalent:@""];
             [actionMenuItem setTarget:self];
             [[menuItem submenu] addItem:actionMenuItem];
             
